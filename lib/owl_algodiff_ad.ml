@@ -129,6 +129,11 @@ let adjval = function
   | DR (_, at, _, _, _) -> !at
   | ap                  -> zero ap
 
+let rec deepest_primal = function
+  | DF (ap, _, _)       -> deepest_primal ap
+  | DR (ap, _, _, _, _) -> deepest_primal ap
+  | ap                  -> ap
+
 let shape = function
   | Mat ap    -> M.shape ap
   | _         -> failwith "error: AD.shape"

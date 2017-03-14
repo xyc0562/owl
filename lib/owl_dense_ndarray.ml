@@ -1075,7 +1075,7 @@ let prod ?axis x =
 
 let tile x reps =
   (* check the validity of reps *)
-  if Array.exists ((>) 1) reps then
+  if Owl_utils.array_exists ((>) 1) reps then
     failwith "tile: repitition must be >= 1";
   (* align and promote the shape *)
   let a = num_dims x in
@@ -1179,7 +1179,7 @@ let squeeze ?(axis=[||]) x =
     | _ -> axis
   in
   let s = Owl_utils.array_filteri (fun i v ->
-    not (v == 1 && Array.mem i a)
+    not (v == 1 && Owl_utils.array_mem i a)
   ) (shape x)
   in
   reshape x s

@@ -33,7 +33,7 @@ let shape x = (x.m, x.n)
 let numel x = x.m * x.n
 
 let prune x r =
-  Hashtbl.filter_map_inplace (fun _ v ->
+  Owl_utils.hashtbl_filter_map_inplace (fun _ v ->
     if v = r then None
     else Some v
   ) x.d
