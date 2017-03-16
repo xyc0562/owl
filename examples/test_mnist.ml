@@ -38,8 +38,8 @@ let backprop nn eta x y =
   let loss = Maths.(cross_entropy y (run_network x nn) / (F (Mat.row_num x |> float_of_int))) in
   reverse_prop (F 1.) loss;
   Array.iter (fun l ->
-    l.w <- Maths.((primal l.w) - (eta * (adjval l.w))) |> primal;
-    l.b <- Maths.((primal l.b) - (eta * (adjval l.b))) |> primal;
+    l.w <- Maths.((primal l.w) - (eta * (adjval l.w))) |> deepest_primal;
+    l.b <- Maths.((primal l.b) - (eta * (adjval l.b))) |> deepest_primal;
   ) nn.layers;
   loss |> unpack_flt
 
@@ -53,11 +53,12 @@ let test_model nn x y =
 
 let _ =
   let x, _, y = Dataset.load_mnist_train_data () in
-  for i = 1 to 500 do
+  for i = 1 to 2000 do
     let x', y' = Dataset.draw_samples x y 100 in
     backprop nn (F 0.01) (Mat x') (Mat y')
     |> Printf.printf "#%i : loss=%g\n" i
     |> flush_all;
+    Gc.compact ();
   done;
   let x, y, _ = Dataset.load_mnist_test_data () in
   let x, y = Dataset.draw_samples x y 10 in

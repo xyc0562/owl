@@ -46,7 +46,6 @@ let array_mapi f x =
 
 let array_map f x = array_mapi (fun _ y -> f y) x
 
-(*
 let array_exists f x =
   try Array.iter (fun a -> if f a then failwith "found") x; false
   with exn -> true
@@ -54,7 +53,8 @@ let array_exists f x =
 let array_mem a x =
   try Array.iter (fun b -> if b = a then failwith "found") x; false
   with exn -> true
-*)
+
+let hashtbl_filter_map_inplace f x = ()
 
 let reverse_array x =
   let d = Array.length x - 1 in

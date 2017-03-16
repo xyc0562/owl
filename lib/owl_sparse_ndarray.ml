@@ -36,7 +36,7 @@ let _remove_ith_item x i =
   for j = i to (nnz x) - 2 do
     x.d.{j} <- x.d.{j + 1}
   done;
-  Hashtbl.filter_map_inplace (fun k v ->
+  Owl_utils.hashtbl_filter_map_inplace (fun k v ->
     if v = i then None
     else if v > i then Some (v - 1)
     else Some v
