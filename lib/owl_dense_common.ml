@@ -110,7 +110,7 @@ type ('a, 'b) lcm_vec_op07 = ('a -> unit) -> ?n:int -> ?ofsx:int -> ?incx:int ->
 type ('a, 'b) lcm_vec_op08 = (int -> 'a -> unit) -> ?n:int -> ?ofsx:int -> ?incx:int -> ('a, 'b) lcm_vec -> unit
 type ('a, 'b) lcm_vec_op09 = ?n:int -> 'a -> ?ofsx:int -> ?incx:int -> ('a, 'b) lcm_vec -> unit
 type ('a, 'b) lcm_vec_op10 = ?n:int -> ?ofsy:int -> ?incy:int -> ?y:('a, 'b) lcm_vec -> ?ofsx:int -> ?incx:int -> ('a, 'b) lcm_vec -> ('a, 'b) lcm_vec
-type ('a, 'b) lcm_vec_op11 = ?cmp:('a -> 'a -> int) -> ?decr:bool -> ?n:int -> ?ofsp:int -> ?incp:int -> ?p:Lacaml_common.int_vec -> ?ofsx:int -> ?incx:int -> ('a, 'b) lcm_vec -> unit
+type ('a, 'b) lcm_vec_op11 = ?cmp:('a -> 'a -> int) -> ?decr:bool -> ?n:int -> ?ofsp:int -> ?incp:int -> ?p:Lacaml.Common.int_vec -> ?ofsx:int -> ?incx:int -> ('a, 'b) lcm_vec -> unit
 type ('a, 'b) lcm_vec_op12 = ?n:int -> ?ofsx:int -> ?incx:int -> ('a, 'b) lcm_vec -> ?ofsy:int -> ?incy:int -> ('a, 'b) lcm_vec -> 'a
 
 type ('a, 'b) lcm_mat_op00 = ('a, 'b) lcm_mat -> 'a array array
@@ -537,28 +537,38 @@ let _copy : type a b. (a, b) kind -> (a, b) lcm_vec_op10 = function
   | Complex32 -> Lacaml.C.copy
   | Complex64 -> Lacaml.Z.copy
   | _         -> failwith "_copy: unsupported operation"
-  
+
 *)
 
+let _copy : type a b. (a, b) kind -> (a, b) lcm_vec_op10 = function
+  | Float32   -> Lacaml.S.copy
+  | Float64   -> Lacaml.D.copy
+  | Complex32 -> Lacaml.C.copy
+  | Complex64 -> Lacaml.Z.copy
+  | _         -> failwith "_copy: unsupported operation"
+
+type ('a, 'b) t_vec = ('a, 'b, c_layout) Array1.t
+
+type ('a, 'b) t_vec_op10 = ?n:int -> ?ofsy:int -> ?incy:int -> ?y:('a, 'b) t_vec -> ?ofsx:int -> ?incx:int -> ('a, 'b) t_vec -> ('a, 'b) t_vec
 
 external scopy_stub :
   n : int ->
   ofsy : int ->
   incy : int ->
-  y : ('a, 'b) lcm_vec ->
+  y : ('a, 'b) t_vec ->
   ofsx : int ->
   incx : int ->
-  x : ('a, 'b) lcm_vec ->
+  x : ('a, 'b) t_vec ->
   unit = "s_copy_stub_bc" "s_copy_stub"
 
 external dcopy_stub :
   n : int ->
   ofsy : int ->
   incy : int ->
-  y : ('a, 'b) lcm_vec ->
+  y : ('a, 'b) t_vec ->
   ofsx : int ->
   incx : int ->
-  x : ('a, 'b) lcm_vec ->
+  x : ('a, 'b) t_vec ->
   unit = "d_copy_stub_bc" "d_copy_stub"
 
 let scopy ?(n=0) ?(ofsy=1) ?(incy=1) ?y ?(ofsx=1) ?(incx=1) x =
@@ -566,7 +576,7 @@ let scopy ?(n=0) ?(ofsy=1) ?(incy=1) ?y ?(ofsx=1) ?(incx=1) x =
     let min_dim_y = ofsy + (n - 1) * abs incy in
     match y with
     | Some y -> y
-    | None -> Array1.create Float32 Fortran_layout min_dim_y in
+    | None -> Array1.create float32 c_layout min_dim_y in
   scopy_stub ~n ~ofsy ~incy ~y ~ofsx ~incx ~x;
   y
 
@@ -575,11 +585,11 @@ let dcopy ?(n=0) ?(ofsy=1) ?(incy=1) ?y ?(ofsx=1) ?(incx=1) x =
     let min_dim_y = ofsy + (n - 1) * abs incy in
     match y with
     | Some y -> y
-    | None -> Array1.create Float64 Fortran_layout min_dim_y in
+    | None -> Array1.create float64 c_layout min_dim_y in
   dcopy_stub ~n ~ofsy ~incy ~y ~ofsx ~incx ~x;
   y
 
-let _copy : type a b. (a, b) kind -> (a, b) lcm_vec_op10 = function
+let __copy : type a b. (a, b) kind -> (a, b) t_vec_op10 = function
   | Float32   -> scopy
   | Float64   -> dcopy
   | _         -> failwith "_copy: unsupported operation"
