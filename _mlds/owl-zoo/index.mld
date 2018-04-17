@@ -1,0 +1,3 @@
+{1 Library owl-zoo}
+This library exposes the following toplevel modules:
+{!modules:Owl_zoo_cmd Owl_zoo_dir Owl_zoo_path Owl_zoo_ver}.
