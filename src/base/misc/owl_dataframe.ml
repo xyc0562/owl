@@ -62,24 +62,6 @@ let pack_float_series x = Float_Series x
 
 let pack_string_series x = String_Series x
 
-
-let make ?data head_names =
-  let col_num = Array.length head_names in
-  let head = Hashtbl.create 64 in
-  Array.iteri (fun i s ->
-    assert (Hashtbl.mem head s = false);
-    Hashtbl.add head s i
-  ) head_names;
-  let data = match data with
-    | Some a -> a
-    | None   -> Array.make col_num Any_Series
-  in
-  assert (Array.length data = col_num);
-  let used = 0 in
-  let size = 0 in
-  { data; head; used; size }
-
-
 let allocate_space data =
   Array.(map (function
     | Bool_Series c   -> Bool_Series (append c (copy c))
@@ -164,6 +146,22 @@ let str_to_elt_fun = function
   | "s" -> fun a -> String a
   | _   -> failwith "str_to_elt_fun: unsupported type"
 
+let make ?data head_names =
+  let col_num = Array.length head_names in
+  let head = Hashtbl.create 64 in
+  Array.iteri (fun i s ->
+    assert (Hashtbl.mem head s = false);
+    Hashtbl.add head s i
+  ) head_names;
+  let data = match data with
+    | Some a -> a
+    | None   -> Array.make col_num Any_Series
+  in
+  assert (Array.length data = col_num);
+  let len = length_series data.(0) in
+  let used = len in
+  let size = len in
+  { data; head; used; size }
 
 let col_num x = Array.length x.data
 
